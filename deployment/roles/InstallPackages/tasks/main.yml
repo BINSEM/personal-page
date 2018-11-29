@@ -1,0 +1,50 @@
+---
+
+  - name: install common packages needed for application development
+    action: apt pkg={{ item }} state=installed
+    with_items:
+      - git
+      - mcrypt
+      - nginx
+      - php-bcmath
+      - php-cli
+      - php-curl
+      - php-fpm
+      - php-intl
+      - php-json
+      - php-mcrypt
+      - php-mbstring
+      - php-xml
+      - php-zip
+      - python-dev
+      - python-setuptools
+      - sqlite3
+
+  - name: Check if composer is exist
+    stat:
+      path: /usr/local/bin/composer
+    register: composer_stat
+
+  - name: install composer
+    shell: |
+     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+     php -r "if (hash_file('sha384', 'composer-setup.php') === '93b54496392c062774670ac18b134c3b3a95e5a5e5c8f1a9f115f203b75bf9a129d5daa8ba6a13e2cc8a1da0806388a8') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+     php composer-setup.php
+     php -r "unlink('composer-setup.php');"
+     sudo mv composer.phar /usr/local/bin/composer
+    when: not composer_stat.stat.exists
+
+  - name: install laravel
+    command: composer global require laravel/installer
+
+  - name: server restarting
+    shell: "sleep 5 && reboot"
+    async: 1
+    poll: 0
+
+  - name: Wait for the reboot to complete if there was a change.
+    wait_for_connection:
+      connect_timeout: 20
+      sleep: 5
+      delay: 5
+      timeout: 300

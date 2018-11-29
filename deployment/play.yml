@@ -1,0 +1,33 @@
+---
+
+# - hosts: vmconnect
+#   vars_files:
+#     - vars/pi.yml
+#   gather_facts: no
+#   remote_user: "{{ UserPi }}"
+#   sudo: True
+#   roles:
+
+#     - InstallPackages
+
+# - hosts: vmconnect
+#   vars_files:
+#     - vars/pi.yml
+#   gather_facts: no
+#   remote_user: "{{ UserPi }}"
+#   sudo: True
+#   roles:
+
+#     - FileConfig
+
+- hosts: vmconnect
+  vars_files:
+    - vars/pi.yml
+  gather_facts: no
+  remote_user: "{{ UserPi }}"
+  sudo: True
+  roles:
+
+    # - PhpConfig
+    - CloneRepo
+

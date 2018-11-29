@@ -1,0 +1,58 @@
+---
+
+  - name: create web file to /var/www/
+    command: mkdir -p /var/www/binsempage
+
+  - name: assign ownership
+    command: chown -R $USER:$USER /var/www/binsempage
+
+  - name: permissions of our web roots
+    command: chmod -R 755 /var/www/binsempage
+
+  - name: copy file index
+    copy: 
+      src: ../webroot/html
+      dest: /var/www/binsempage
+      mode: 0644
+
+  - name: web config file by copying over the default file
+    command: cp /etc/nginx/sites-available/default /etc/nginx/sites-available/binsempage.conf
+
+  - name: web config file by copying over the default file
+    copy: 
+      src: files/binsempage.conf 
+      dest: /etc/nginx/sites-available/binsempage.conf
+
+  - name: Check if the same enabled web server is exist
+    stat:
+      path: /etc/nginx/sites-enabled/binsempage.conf
+    register: server_stat
+
+  - name: Enable web Server
+    command: ln -s /etc/nginx/sites-available/binsempage.conf /etc/nginx/sites-enabled/
+    when: not server_stat.stat.exists
+
+  # - name: modification nginx config file
+  #   copy: 
+  #     src: nginx.conf 
+  #     dest: /etc/nginx/nginx.conf
+
+  - name: modification nginx config file
+    lineinfile:
+      path: /etc/nginx/nginx.conf
+      line: '        server_names_hash_bucket_size 64;'
+      insertbefore: .*server_names_hash_bucket_size 64;
+
+  # - name: Modify hosts file
+  #   copy: 
+  #     src: etc/hosts 
+  #     dest: files/etc/hosts
+
+  - name: Add line hosts file
+    lineinfile:
+      path: /etc/hosts
+      line: '127.0.1.1       binsempage.local'
+      insertafter: .*localhost
+    
+  - name: restart nginx
+    command: systemctl restart nginx

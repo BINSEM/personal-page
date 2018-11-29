@@ -3,7 +3,8 @@
   - name: Cloning repos personal-page
     git: 
       repo: https://github.com/BINSEM/personal-page.git
-      dest: /home/pi/personal-page
+      dest: /home/pi/php-laravel
+      version: php
 
-  - name: Move webroot to /var/www/binsemLravelPage
+  # - name: Move webroot to /var/www/binsemLravelPage
     

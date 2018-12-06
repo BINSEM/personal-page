@@ -1,10 +1,46 @@
 ---
 
+  - name: Check if the Repo exist
+    stat:
+      path: /var/www/personal-page
+    register: repo_state
+
   - name: Cloning repos personal-page
     git: 
       repo: https://github.com/BINSEM/personal-page.git
-      dest: /home/pi/php-laravel
+      dest: /var/www/personal-page
       version: php
+      clone: yes
+    when: not repo_state.stat.exists
 
-  # - name: Move webroot to /var/www/binsemLravelPage
+  - name: assign ownership
+    command: chown -R www-data:www-data /var/www/personal-page/webroot/php-laravel
+
+  - name: permissions of our web roots
+    command: chmod -R 755 /var/www/personal-page/webroot/php-laravel/storage
+
+  - name: web config file by copying over the default file
+    command: cp /etc/nginx/sites-available/binsempage.conf /etc/nginx/sites-available/php-laravel.conf
+
+  - name: web file config
+    copy: 
+      src: files/php-laravel.conf
+      dest: /etc/nginx/sites-available/php-laravel.conf
+
+  - name: Check if the same enabled web server is exist
+    stat:
+      path: /etc/nginx/sites-enabled/php-laravel.conf
+    register: server_stat
+
+  - name: Enable web Server php-laravel.conf
+    command: ln -s /etc/nginx/sites-available/php-laravel.conf /etc/nginx/sites-enabled/
+    when: not server_stat.stat.exists
+
+  - name: Add line hosts file
+    lineinfile:
+      path: /etc/hosts
+      line: '127.0.1.1       php-laravel.local'
+      insertafter: .*localhost
     
+  - name: restart nginx
+    command: systemctl restart nginx

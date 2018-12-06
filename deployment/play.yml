@@ -31,3 +31,13 @@
     # - PhpConfig
     - CloneRepo
 
+- hosts: vmconnect
+  vars_files:
+    - vars/pi.yml
+  gather_facts: no
+  remote_user: "{{ UserPi }}"
+  sudo: False
+  roles:
+
+    - UpdateComposer
+

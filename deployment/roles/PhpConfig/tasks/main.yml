@@ -1,21 +1,21 @@
 ---
 
   - name: ensure php5-fpm cgi.fix_pathinfo=0
-    lineinfile: dest=/etc/php/7.0/fpm/php.ini regexp='^(.*)cgi.fix_pathinfo=' line=cgi.fix_pathinfo=0
+    lineinfile: dest=/etc/php/7.1/fpm/php.ini regexp='^(.*)cgi.fix_pathinfo=' line=cgi.fix_pathinfo=0
 
   - name: Check if mcrypt.ini file is exist
     stat:
-      path: /etc/php/7.0/cli/conf.d/20-mcrypt.ini
+      path: /etc/php/7.1/cli/conf.d/20-mcrypt.ini
     register: mcrypt_stat
 
   - name: enable php mcrypt module
-    shell: php5enmod mcrypt
+    shell: phpenmod mcrypt
     args:
-      creates: /etc/php/7.0/cli/conf.d/20-mcrypt.ini
+      creates: /etc/php/7.1/cli/conf.d/20-mcrypt.ini
     when: not mcrypt_stat.stat.exists
 
   - name: restart php-fpm
-    service: name=php7.0-fpm state=restarted
+    service: name=php7.1-fpm state=restarted
 
   - name: restart nginx
     service: name=nginx state=restarted

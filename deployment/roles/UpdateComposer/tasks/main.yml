@@ -1,0 +1,6 @@
+---
+
+  - composer:
+      command: update
+      working_dir: /var/www/personal-page/webroot/php-laravel
+      ignore_errors: yes
